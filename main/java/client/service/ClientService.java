@@ -1,13 +1,13 @@
 package client.service;
 
+import server.inter.LogCreater;
+
 import javax.swing.*;
 import java.awt.*;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 
-public class ClientService extends JFrame {
+public class ClientService extends JFrame implements LogCreater {
     private Socket socket;
     private DataInputStream dis;
     private DataOutputStream dos;
@@ -31,6 +31,8 @@ public class ClientService extends JFrame {
                         if (strMsg.startsWith("/authOk")) {
                             setAutorized(true);
                             myNick = strMsg.split("\\s")[1];
+                            //Пишет в лог файл
+                            LogIn();
                             break;
                         }
                         //chatArea.appendText(strMsg + "\n");
@@ -67,6 +69,8 @@ public class ClientService extends JFrame {
         }
         try {
             dos.writeUTF("/auth" );
+            //Вывод из лога последних 100 строк
+            Logout();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -74,5 +78,24 @@ public class ClientService extends JFrame {
     }
 
     private void setAutorized(boolean b) {
+    }
+
+    @Override
+    public void Logout() throws IOException {
+        //Вывод из лога ну не последних 100 строк, всего лога...))
+
+
+        dis.readUTF((DataInput) new BufferedInputStream(new FileInputStream("Log.txt")));
+        dis.close();
+
+
+    }
+
+    @Override
+    public void LogIn() throws IOException {
+        //Пишет в лог файл
+        dos.writeUTF(String.valueOf(new BufferedOutputStream(new FileOutputStream("Log.txt"))));
+
+
     }
 }
