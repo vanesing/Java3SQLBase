@@ -26,9 +26,11 @@ class SimpleSemaphore<Car>{
     final Semaphore semaphore = new Semaphore(4);
     Runnable limit =
             new Runnable() {
+
                 int count = 0;
 
                 public void run() {
+                    int time = 3 +(int) (Math.random()* 4.0);
                     int num = count++;
                     try {
                         semaphore.acquire();
@@ -42,7 +44,12 @@ class SimpleSemaphore<Car>{
                     }
 
                 }
+
             };
+     // for (int i= 0; i<10; i++)
+     //new Thread(limit).start();
+    // забыл дописать счетчик, и время работы.
+    // Но почему то 49 и 50 у меня не работают, не понял почему
 }
 
 
