@@ -1,6 +1,7 @@
 package server.handler;
 
 import server.inter.Server;
+import server.inter.Test;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -19,6 +20,7 @@ public class ClientHandler {
     public String getNick() {
         return nick;
     }
+
 
     public ClientHandler(Server server, Socket socket) {
         try {
