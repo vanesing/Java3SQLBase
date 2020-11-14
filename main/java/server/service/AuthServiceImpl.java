@@ -1,6 +1,7 @@
 package server.service;
 
 import server.inter.AuthService;
+import server.inter.Test;
 
 
 import java.sql.Connection;
@@ -96,6 +97,7 @@ public class AuthServiceImpl implements AuthService {
 
 
     }
+
 
     private class UserEntity {
         private String login;
