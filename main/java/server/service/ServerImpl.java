@@ -11,13 +11,16 @@ import java.net.Socket;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.*;
 
 public class ServerImpl implements Server {
 
     private List<ClientHandler> clients;
     private AuthService authService;
+    private static final Logger logger = Logger.getLogger(ServerImpl.class.getName());
 
-    public ServerImpl() throws SQLException {
+    public ServerImpl() throws SQLException, IOException {
+        logger.setLevel(Level.ALL);
         try {
             ServerSocket serverSocket = new ServerSocket(PORT); // Создаем сокет на сервере
             authService = new AuthServiceImpl(); // Создаем список авторизованных клиентов
@@ -25,22 +28,36 @@ public class ServerImpl implements Server {
             clients = new LinkedList<>(); // Создаем список клиентов
             // Цикл подключения клиентов
             while (true) { // Подключение клиентов
+                Handler handler = new FileHandler("LOG.log");
+                handler.setFormatter(new SimpleFormatter());
+                logger.log(Level.SEVERE,"Ожидаем подключения клиентов");
+                logger.addHandler(handler);
                 System.out.println("Ожидаем подключения клиентов");
                 Socket socket = serverSocket.accept(); // Ожидание подключения клиента
+                logger.log(Level.SEVERE,"Клиент подключился");
+                logger.addHandler(handler);
                 System.out.println("Клиент подключился");
                 new ClientHandler(this, socket); // Создаем для каждого клиент свой обработчик
             }
-        } catch (IOException | SQLException | ClassNotFoundException e) {
+        } catch ( IOException | SQLException | ClassNotFoundException e) {
+            Handler handlerWarn = new FileHandler("Warn.log");
+            handlerWarn.setFormatter(new SimpleFormatter());
+            logger.log(Level.WARNING,"Проблема на сервере");
+            logger.addHandler(handlerWarn);
             System.out.println("Проблема на сервере");
         } finally {
             if (authService != null) {
                 authService.stop(); // Сообщение об остановке сервера аутентификации
+                Handler handlerStop = new FileHandler("LogStop.log");
+                handlerStop.setFormatter(new SimpleFormatter());
+                logger.log(Level.WARNING,"Сервер остановлен");
+                logger.addHandler(handlerStop);
             }
         }
     }
 
     // Метод отсылки приватного сообщения
-    public void sendPrivateMsg(ClientHandler fromClient, String toClient, String msg) {
+    public void sendPrivateMsg(ClientHandler fromClient, String toClient, String msg) throws IOException {
         for (ClientHandler clientHandler : clients) {
             if (clientHandler.getNick().equals(toClient)) {
                 clientHandler.sendMsg("От " + fromClient.getNick() + ": " + msg);
@@ -48,6 +65,10 @@ public class ServerImpl implements Server {
                 return;
             } else {
                 fromClient.sendMsg(toClient + " не подключен к чату!");
+                Handler handlerConnCl = new FileHandler("Ошибки подключения к чату.log");
+                handlerConnCl.setFormatter(new SimpleFormatter());
+                logger.log(Level.SEVERE,"Не подключен к чату");
+                logger.addHandler(handlerConnCl);
             }
         }
     }

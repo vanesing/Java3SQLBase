@@ -2,6 +2,8 @@ package server.inter;
 
 import server.handler.ClientHandler;
 
+import java.io.IOException;
+
 public interface Server {
     int PORT = 8189;
 
@@ -15,7 +17,7 @@ public interface Server {
 
     AuthService getAuthService();
 
-    void sendPrivateMsg(ClientHandler clientHandler, String nick, String clientStr);
+    void sendPrivateMsg(ClientHandler clientHandler, String nick, String clientStr) throws IOException;
 
     void sendMsgToClient(ClientHandler from, String to, String msg);
 
